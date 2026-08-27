@@ -1,0 +1,16 @@
+# Sanal ortam
+venv/
+.venv/
+
+# Python derleme artifactleri
+__pycache__/
+*.pyc
+
+# Ortam degiskenleri - ASLA takip edilmez (gizli anahtarlar icerir)
+.env
+
+# Flask instance klasoru
+instance/
+
+# SQLite veritabani dosyalari
+*.db
