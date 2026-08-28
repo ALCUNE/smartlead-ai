@@ -39,8 +39,13 @@ class Config:
     # Tek bir sohbet mesajı için kabul edilen maksimum karakter sayısı.
     MAX_MESSAGE_LENGTH = int(os.environ.get("MAX_MESSAGE_LENGTH", 2000))
 
-    # SQLite veritabanı dosya adı.
+    # SQLite veritabanı dosya adı (yerel geliştirme varsayılanı).
     DATABASE_NAME = os.environ.get("DATABASE_NAME", "zuzu_leads.db")
+
+    # PostgreSQL bağlantı adresi. Tanımlıysa veritabanı katmanı SQLite
+    # yerine PostgreSQL kullanır; boşsa yerel SQLite davranışı sürer.
+    # Bu değer bir kimlik bilgisi taşır: asla günlüğe yazılmaz.
+    DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
     # CORS izin verilen kaynaklar (virgülle ayrılmış liste veya "*").
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
