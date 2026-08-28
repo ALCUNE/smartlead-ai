@@ -307,4 +307,4 @@ bir yapılandırma dosyası olarak bulunmaz.
 
 - **GitHub:** https://github.com/ALCUNE/smartlead-ai
 - **Backend (Render):** https://smartlead-ai-8bj1.onrender.com
-- **Wix sitesi:** [Wix site bağlantısı eklenecek]
+- **Wix sitesi:** https://descerpeo.wixsite.com/my-site-6
