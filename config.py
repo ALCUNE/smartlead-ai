@@ -25,7 +25,7 @@ class Config:
     GROQ_API_URL = os.environ.get(
         "GROQ_API_URL", "https://api.groq.com/openai/v1/chat/completions"
     )
-    GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
+    GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 
     # AI isteği için üretim/zaman aşımı parametreleri.
     AI_TIMEOUT = int(os.environ.get("AI_TIMEOUT", 30))
