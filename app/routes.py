@@ -12,7 +12,9 @@ Gizlilik: Hiçbir durumda iç hata izleri (traceback) istemciye gönderilmez;
 ayrıntılar yalnızca sunucu günlüğüne yazılır.
 """
 
+import hmac
 import re
+from functools import wraps
 
 from flask import Blueprint, current_app, jsonify, request
 
@@ -20,6 +22,9 @@ from app import database
 from services.ai_service import AIServiceError, ai_service
 
 api_bp = Blueprint("api", __name__)
+
+# Yönetim isteklerinin anahtarı bu HTTP başlığında taşınır.
+ADMIN_BASLIK = "X-Admin-Key"
 
 # Telefon numarası için esnek doğrulama: rakam, boşluk, +, -, parantez.
 TELEFON_DESENI = re.compile(r"^[0-9+\-\s()]{7,25}$")
@@ -41,6 +46,34 @@ def _hata(mesaj, durum):
         tuple: (Flask response, durum kodu)
     """
     return jsonify({"basari": False, "hata": mesaj}), durum
+
+
+def _admin_gerekli(f):
+    """Rotayı paylaşılan yönetim anahtarı ile korur.
+
+    Anahtar yapılandırılmamışsa erişim açılmaz (fail closed). Karşılaştırma
+    zamanlama saldırılarına karşı `hmac.compare_digest` ile yapılır.
+    """
+
+    @wraps(f)
+    def sarmalayici(*args, **kwargs):
+        beklenen = current_app.config.get("ADMIN_API_KEY", "")
+        if not beklenen:
+            current_app.logger.error(
+                "ADMIN_API_KEY tanımlı değil; yönetim erişimi kapalı."
+            )
+            return _hata("Yönetim erişimi yapılandırılmamış.", 503)
+
+        gelen = request.headers.get(ADMIN_BASLIK, "")
+        if not gelen or not hmac.compare_digest(gelen, beklenen):
+            current_app.logger.warning(
+                "Yetkisiz lead listesi denemesi reddedildi."
+            )
+            return _hata("Yetkisiz erişim.", 401)
+
+        return f(*args, **kwargs)
+
+    return sarmalayici
 
 
 def _govde_al():
@@ -163,11 +196,17 @@ def lead_olustur():
 
 
 @api_bp.route("/leads", methods=["GET"])
+@_admin_gerekli
 def lead_listele():
     """Kayıtlı tüm müşteri adaylarını en yeniden en eskiye listeler.
 
+    Kişisel veri içerdiği için yalnızca geçerli `X-Admin-Key` başlığı ile
+    erişilebilir.
+
     Yanıtlar:
-        200: {"basari": true, "data": [...], "toplam": 3}
+        200: {"basari": True, "data": [...], "toplam": 3}
+        401: Anahtar eksik veya geçersiz.
+        503: Sunucuda ADMIN_API_KEY tanımlı değil.
     """
     try:
         leadler = database.tum_leadler()

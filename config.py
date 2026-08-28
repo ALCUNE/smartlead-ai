@@ -45,6 +45,10 @@ class Config:
     # CORS izin verilen kaynaklar (virgülle ayrılmış liste veya "*").
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
 
+    # Yönetim panelinin lead listesini okuyabilmesi için paylaşılan anahtar.
+    # Tanımlı değilse GET /api/leads erişimi tamamen kapalı kalır.
+    ADMIN_API_KEY = os.environ.get("ADMIN_API_KEY", "")
+
     # Sunucu portu ve aktif ortam adı ("development" / "production").
     PORT = int(os.environ.get("PORT", 5000))
     FLASK_ENV = os.environ.get("FLASK_ENV", "development")
