@@ -141,7 +141,12 @@ class AIService:
             "model": self.config.GROQ_MODEL,
             "messages": self._mesajlari_hazirla(mesaj, gecmis),
             "temperature": self.config.AI_TEMPERATURE,
-            "max_tokens": self.config.AI_MAX_TOKENS,
+            # Groq `max_tokens` alanını `max_completion_tokens` lehine
+            # kullanımdan kaldırdı; akıl yürütme modelleri için gerekli ad.
+            "max_completion_tokens": self.config.AI_MAX_TOKENS,
+            # Akıl yürütme metni yanıtta taşınmaz ve ücretlendirilmez.
+            "include_reasoning": False,
+            "reasoning_effort": "low",
         }
         basliklar = {
             "Authorization": f"Bearer {self.config.GROQ_API_KEY}",
